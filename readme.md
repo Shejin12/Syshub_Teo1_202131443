@@ -38,12 +38,148 @@ SysHub se basa en una arquitectura cliente-servidor separada:
 
 ## 3. Diccionario de Datos Principal
 
-- **User**: Maneja la identidad. (`id`, `email`, `password`, `name`, `role`). El rol puede ser ESTUDIANTE, AUXILIAR o ADMIN.
-- **RecoveryCode**: (`codigos_recuperacion`) Tabla para la lógica de olvido de contraseñas. (`id`, `code`, `userId`, `expiresAt`).
-- **Project**: Los repositorios/proyectos compartidos. (`id`, `title`, `description`, `techStack`, `tags`, `isHighlighted`, `authorId`).
-- **Thread**: Hilos de discusión para el Sys-Reddit. (`id`, `title`, `content`, `authorId`, `category`).
-- **Comment**: Comentarios de un hilo. (`id`, `content`, `authorId`, `threadId`).
-- **Vote**: Tabla pivot para votos (+1 / -1) asegurando que un usuario solo vote una vez por hilo/comentario. (`id`, `value`, `userId`, `threadId`, `commentId`).
+A continuación se detallan las tablas que componen la base de datos de SysHub:
+
+### Tabla: `User`
+Almacena la información de los usuarios del sistema.
+
+| Campo | Tipo | Descripción |
+| :--- | :--- | :--- |
+| `id` | Int (PK) | Identificador único autoincremental. |
+| `email` | String (U) | Correo electrónico del usuario (único). |
+| `password` | String | Contraseña hasheada. |
+| `name` | String | Nombre completo del usuario. |
+| `bio` | String? | Biografía opcional del usuario. |
+| `roleId` | Int (FK) | Referencia al rol del usuario. |
+| `statusId` | Int (FK) | Referencia al estado de la cuenta. |
+| `createdAt` | DateTime | Fecha de creación del registro. |
+| `updatedAt` | DateTime | Fecha de última actualización. |
+
+### Tabla: `Role`
+Define los roles disponibles en el sistema (ADMIN, AUXILIAR, ESTUDIANTE).
+
+| Campo | Tipo | Descripción |
+| :--- | :--- | :--- |
+| `id` | Int (PK) | Identificador único. |
+| `name` | String (U) | Nombre del rol. |
+
+### Tabla: `Status`
+Define los estados posibles de una cuenta de usuario.
+
+| Campo | Tipo | Descripción |
+| :--- | :--- | :--- |
+| `id` | Int (PK) | Identificador único. |
+| `name` | String (U) | Nombre del estado (ej. Activo, Inactivo). |
+
+### Tabla: `Project`
+Repositorios y proyectos compartidos por los estudiantes.
+
+| Campo | Tipo | Descripción |
+| :--- | :--- | :--- |
+| `id` | Int (PK) | Identificador único. |
+| `title` | String | Título del proyecto. |
+| `description` | String | Descripción detallada. |
+| `techStack` | String | Tecnologías utilizadas (texto). |
+| `fileUrl` | String? | Enlace al archivo del proyecto. |
+| `attachments` | String? | Adjuntos adicionales. |
+| `category` | String? | Categoría del proyecto. |
+| `authorId` | Int (FK) | ID del autor (User). |
+| `highlightedById` | Int? (FK) | ID del auxiliar que destacó el proyecto. |
+| `createdAt` | DateTime | Fecha de creación. |
+| `updatedAt` | DateTime | Fecha de actualización. |
+
+### Tabla: `Tag`
+Etiquetas para categorizar los proyectos.
+
+| Campo | Tipo | Descripción |
+| :--- | :--- | :--- |
+| `id` | Int (PK) | Identificador único. |
+| `name` | String (U) | Nombre de la etiqueta. |
+
+### Tabla: `ProjectTag`
+Tabla pivot para la relación muchos a muchos entre Proyectos y Etiquetas.
+
+| Campo | Tipo | Descripción |
+| :--- | :--- | :--- |
+| `projectId` | Int (PK, FK)| ID del proyecto. |
+| `tagId` | Int (PK, FK) | ID de la etiqueta. |
+
+### Tabla: `Thread`
+Hilos de discusión en los foros (Sys-Reddit).
+
+| Campo | Tipo | Descripción |
+| :--- | :--- | :--- |
+| `id` | Int (PK) | Identificador único. |
+| `title` | String | Título del hilo. |
+| `content` | String | Contenido o cuerpo del hilo. |
+| `category` | String? | Categoría del hilo. |
+| `authorId` | Int (FK) | ID del autor. |
+| `createdAt` | DateTime | Fecha de creación. |
+| `updatedAt` | DateTime | Fecha de actualización. |
+
+### Tabla: `Comment`
+Comentarios realizados en hilos, proyectos o blogs. Soporta anidamiento.
+
+| Campo | Tipo | Descripción |
+| :--- | :--- | :--- |
+| `id` | Int (PK) | Identificador único. |
+| `content` | String | Contenido del comentario. |
+| `authorId` | Int (FK) | ID del autor. |
+| `threadId` | Int? (FK) | ID del hilo relacionado (si aplica). |
+| `projectId` | Int? (FK) | ID del proyecto relacionado (si aplica). |
+| `blogId` | Int? (FK) | ID del blog relacionado (si aplica). |
+| `parentId` | Int? (FK) | ID del comentario padre (para respuestas). |
+| `createdAt` | DateTime | Fecha de creación. |
+| `updatedAt` | DateTime | Fecha de actualización. |
+
+### Tabla: `Blog`
+Artículos o publicaciones informativas.
+
+| Campo | Tipo | Descripción |
+| :--- | :--- | :--- |
+| `id` | Int (PK) | Identificador único. |
+| `title` | String | Título del artículo. |
+| `content` | String | Contenido del artículo. |
+| `authorId` | Int (FK) | ID del autor. |
+| `createdAt` | DateTime | Fecha de creación. |
+| `updatedAt` | DateTime | Fecha de actualización. |
+
+### Tabla: `Vote`
+Registro de votos (+1/-1) para hilos y comentarios.
+
+| Campo | Tipo | Descripción |
+| :--- | :--- | :--- |
+| `id` | Int (PK) | Identificador único. |
+| `value` | Int | Valor del voto (1 o -1). |
+| `userId` | Int (FK) | ID del usuario que vota. |
+| `threadId` | Int? (FK) | ID del hilo votado. |
+| `commentId` | Int? (FK) | ID del comentario votado. |
+
+### Tabla: `codigos_recuperacion`
+Códigos temporales para el restablecimiento de contraseñas.
+
+| Campo | Tipo | Descripción |
+| :--- | :--- | :--- |
+| `id` | Int (PK) | Identificador único. |
+| `code` | String | Código de 5-6 caracteres. |
+| `userId` | Int (FK) | ID del usuario. |
+| `createdAt` | DateTime | Fecha de generación. |
+| `expiresAt` | DateTime | Fecha de expiración. |
+
+### Tabla: `Report`
+Reportes de moderación para contenidos del sistema.
+
+| Campo | Tipo | Descripción |
+| :--- | :--- | :--- |
+| `id` | Int (PK) | Identificador único. |
+| `reason` | String | Motivo del reporte. |
+| `status` | String | Estado (PENDING, RESOLVED, DISMISSED). |
+| `reporterId` | Int (FK) | ID del usuario que reporta. |
+| `targetType` | String | Tipo de objetivo (PROJECT, THREAD, etc.). |
+| `targetId` | Int | ID del contenido reportado. |
+| `createdAt` | DateTime | Fecha de creación. |
+| `updatedAt` | DateTime | Fecha de actualización. |
+
 
 ---
 
