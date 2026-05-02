@@ -3,7 +3,7 @@
 ## 1. Arquitectura del Sistema
 SysHub se basa en una arquitectura cliente-servidor separada:
 - **Frontend**: Aplicación Single-Page (SPA) desarrollada en **Vue.js 3** con la Composition API. Utiliza **Tailwind CSS** para los estilos, **Vue Router** para la navegación y **Pinia** para la gestión del estado global (autenticación).
-- **Backend**: API RESTful construida con **NestJS** (Node.js). Implementa guardias JWT para la seguridad, bcrypt para el hasheo de contraseñas, y el decorador `@UseGuards(AuthGuard('jwt'))` para proteger rutas.
+- **Backend**: API RESTful construida con **NestJS** (Node.js). Implementa guardias JWT para la seguridad, bcrypt para el hasheo de contraseñas, y el decorador  `@UseGuards(AuthGuard('jwt'))` para proteger rutas.
 - **Base de Datos**: Base de datos relacional **PostgreSQL**, modelada e interactuada a través del ORM **Prisma**. El uso de Prisma asegura la persistencia de datos tipados y migraciones eficientes.
 
 ## 2. Documentación de la API
