@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+/* Eliminamos el max-width y el centrado manual porque 
+   el diseño de SysHub usa sus propias clases de Tailwind 
+   como 'max-w-7xl' y 'mx-auto' */
+body {
+  margin: 0;
+  min-height: 100vh;
+}
